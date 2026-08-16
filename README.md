@@ -62,3 +62,7 @@ ingests real camera and LiDAR rosbags.
 
 - `lab--future-plans--docs/RESEARCH_DIRECTIONS.md`, entries Q7, Q6, A3 and R1
 - `_references/autonomous_driving/nvidia_2026_omnidreams.pdf`
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
