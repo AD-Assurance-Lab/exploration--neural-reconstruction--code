@@ -1,0 +1,203 @@
+%% =====================================================================
+%% One page on the proof of concept, plus an appendix page.
+%% AD Assurance Lab, Western Michigan University.
+%% =====================================================================
+\documentclass[10pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.72in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{authblk}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.6ex plus .2ex minus .2ex}{1.0ex plus .1ex}
+\titlespacing*{\subsection}{0pt}{1.3ex plus .2ex minus .2ex}{0.7ex plus .1ex}
+\captionsetup{font=small,labelfont=bf}
+\renewcommand\Authfont{\normalsize}
+\renewcommand\Affilfont{\small\itshape}
+\setlength{\affilsep}{0.3em}
+\pagestyle{plain}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{5}
+\raggedbottom
+
+\title{\bfseries\large Rebuilt Roads Move a Driving Policy as Much as Fog Does:
+A First Acceptance Measurement on Real Frames}
+
+\author[1]{Zachary D. Asher}
+\affil[1]{AD Assurance Lab, Western Michigan University, Kalamazoo, MI, USA}
+\date{\vspace{-1.0em}\small September 20, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Our verified disturbance family needs a clear frame and a degraded frame at one
+camera pose, and no published dataset supplies that pair. Neural reconstruction
+can, so we built the acceptance test first and measured the reconstruction with
+it. On a real recorded clip, the rebuilt frame moves an open reasoning policy's
+planned path by 0.25\,m at a three-second horizon. A deliberately heavy fog on
+the real frame moves it by 0.33\,m. The substrate error is the size of the
+disturbance we wanted to certify, and at six seconds its worst pose is larger. The policy's own sampling moves it further still, by 1.67\,m.
+\end{abstract}
+
+\section{Why this measurement}
+The lab verifies a policy over a one-parameter family between two images of one
+scene. That needs $x_\text{clear}$ and $x_\text{cond}$ at an identical camera
+pose, which no published adverse-weather dataset supplies. Reconstruction
+promises those endpoints from any logged drive, and it carries a trap we have
+measured once. An analytic fog model reproduced simulator fog at road-ROI
+$R^2=0.848$, a good image score. It then drove one policy 23.8 times harder than
+real fog, and stayed faithful for another. Image fidelity is not the property
+that matters, so the acceptance test is behavioral and it comes first.
+
+That test has three steps, and this note reports the middle one. We first
+measure the spread between two real frames, and then check the rebuilt clear
+frame against the real one. A rebuilt adverse frame comes last, and only after
+those two pass.
+
+\section{What we ran}
+\textbf{Data.} One clip from the public NVIDIA reconstruction collection, which
+ships the real forward video and the recorded rig poses beside the
+reconstruction. We used its first eight seconds at 10\,Hz and 1920 by 1080, from a night
+drive at about 18\,m/s.
+
+\textbf{Rendering.} The 2026 engine renders along the recorded trajectory, one
+image per camera frame, so rendered frame $N$ sits at the pose of recorded frame
+$N$. That is the pairing the test needs.
+
+\textbf{Policy.} Alpamayo 1.5, an open 10-billion-parameter reasoning model that
+predicts 6.4\,s of trajectory and a short reasoning trace. On the real frames it
+predicts 19.6\,m of travel in one second, which matches the recorded speed. It
+needs 22.5\,GB of our 32\,GB card and answers in about 0.5\,s per pose.
+
+\textbf{Control.} The known-bad disturbance from the protocol, an analytic
+Koschmieder fog on the real frame, which exists so the instrument has something
+it must reject.
+
+\section{What we measured}
+We run the policy over the same 65 poses on each image set. The configuration
+is repeatable: greedy text, one trajectory, one fixed seed. A repeat run
+reproduces the first exactly, so the floor is 0.00\,m. Every centimeter of
+difference then belongs to the image.
+
+Fig.~\ref{fig:gap} and Table~\ref{tab:main} give the result. The rebuilt frame
+moves the planned path by 0.25\,m at three seconds, against 0.33\,m for heavy
+fog on the real frame. At six seconds the mean is smaller, 0.80\,m against
+1.20\,m, but the worst rebuilt pose is larger, 4.20\,m against 3.20\,m.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/gap_horizon.pdf}
+  \caption{Three ways to move the same policy at the same poses. The
+  reconstruction sits beside the disturbance it has to carry, and the triangles
+  mark the worst pose of each.}
+  \label{fig:gap}
+\end{figure}
+
+\section{What follows from it}
+\textbf{This reconstruction cannot yet carry this disturbance.} A certificate
+over a fog-sized family, computed on this rebuild, would rest on a substrate
+whose own error is the size of the family. The clear-frame step exists to catch
+exactly that, and it caught it on the first clip we tried.
+
+\textbf{It is a measurement, not a verdict.} One clip, one camera, one policy,
+and the engine has settings we have not explored. The number to improve is now
+defined, and it is behavioral rather than photometric.
+
+\textbf{Hold the sampling still, or measure nothing.} With sampling on, the
+policy disagrees with itself by 1.67\,m at three seconds, which beats either
+image effect. Our protocol requires the repeatable configuration, and records
+that spread beside every gap.
+
+\clearpage
+\appendix
+\section{Method, defects and limits}
+
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}{0.49\columnwidth}
+    \includegraphics[width=\linewidth]{figures/frame_clear.png}
+    \caption{recorded}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.49\columnwidth}
+    \includegraphics[width=\linewidth]{figures/frame_rebuilt.png}
+    \caption{rebuilt}
+  \end{subfigure}\\[3pt]
+  \begin{subfigure}{0.49\columnwidth}
+    \includegraphics[width=\linewidth]{figures/frame_fog.png}
+    \caption{the known-bad fog}
+  \end{subfigure}
+  \caption{One pose, three image sources. The policy sees each in turn, and the
+  instrument compares what it plans.}
+  \label{fig:frames}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{Rebuilt frame} & \multicolumn{2}{c}{Known-bad fog} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Horizon & mean & worst & mean & worst \\
+\midrule
+1\,s & 0.04\,m & 0.25\,m & 0.05\,m & 0.34\,m \\
+3\,s & 0.25\,m & 1.29\,m & 0.33\,m & 1.52\,m \\
+6\,s & 0.80\,m & 4.20\,m & 1.20\,m & 3.20\,m \\
+\bottomrule
+\end{tabular}
+\caption{Sixty-five poses of one clip, against the real frame at the same pose.
+The policy's own sampling spread is 0.23\,m, 1.67\,m and 4.37\,m.}
+\label{tab:main}
+\end{table}
+
+\subsection{How to repeat it}
+The scripts live in \texttt{scripts/} of the reconstruction repository.
+\begin{verbatim}
+render --artifact-path S --camera-id C
+       --image-scale 1.0 --frame-step 3
+
+make_rendered_frames.py --rendered R
+       --usdz S --rendered-step 3
+
+run_policy.py  --frames F --samples 1
+       --temperature 0.0 --stride 1
+
+response_gap.py --a REAL --b REBUILT
+       --horizon 3.0
+\end{verbatim}
+
+\subsection{A defect the instrument caught}
+The first run predicted a path that ran backwards. The scene file stores the rig
+pose in the world, and we had inverted it, which mirrors the ego history. The
+policy followed that mirrored history faithfully. No image score would have
+shown this, and the behavioral check showed it in one plot.
+
+\subsection{Limits, stated plainly}
+One clip. One camera of the four the policy expects. Eight seconds. Night, clear
+weather, one road. The real frames come from a compressed video, and the rebuilt
+frames come from the engine's default renderer at native resolution. The fog is
+our control, not a measured disturbance. Four samples give a coarse spread. None
+of this is a certificate.
+
+\begin{figure}[b]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/gap_time.pdf}
+  \caption{The reconstruction gap at a three-second horizon, at every pose. It
+  never reaches zero, and it peaks where the road bends.}
+  \label{fig:time}
+\end{figure}
+
+\end{document}

@@ -2,8 +2,9 @@
 
 Real-world pose-paired disturbance endpoints via neural scene reconstruction.
 
-**Owner:** unassigned. **Status:** new, empty. Highest ceiling on the roadmap, and not the
-place to start.
+**Owner:** unassigned. **Status:** acceptance protocol frozen 2026-09-18. The measuring
+instrument runs, and it has its first numbers on a real road (2026-09-19). See
+[PROOF_OF_CONCEPT.md](PROOF_OF_CONCEPT.md) and [TOOLING.md](TOOLING.md).
 
 ## The problem it solves
 
@@ -52,6 +53,10 @@ real fog, while staying faithful for another. It was most wrong about the better
 
 **A reconstruction is validated when the policy responds to it the way it responds to the
 real frame**, at matched poses. Design that check before building anything.
+
+[PROTOCOL.md](PROTOCOL.md) is that design. It defines the acceptance test whose reference
+is a real frame, not a rendered one. It says how to measure the tolerance band from real repeats. It
+puts the known-bad control first. It also says which experiment waits on which missing piece.
 
 ## Prior art and tooling
 
