@@ -31,3 +31,7 @@ carla-*.log
 *.fdb_latexmk
 *.out
 *.log
+
+# Images made from the NVIDIA driving data. See report/README.md.
+report/figures/*.png
+report/*.mp4
