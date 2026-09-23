@@ -1,4 +1,4 @@
-# neural-reconstruction--automated-driving--code
+# exploration--neural-reconstruction--code
 
 Real-world pose-paired disturbance endpoints from neural scene reconstruction.
 See `README.md`.
