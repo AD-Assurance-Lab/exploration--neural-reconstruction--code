@@ -9,7 +9,7 @@ venv/
 # Experiment outputs (large, regenerable)
 results/**/*.npz
 results/**/*.png
-data/
+data
 *.ckpt
 *.pt
 *.pth
